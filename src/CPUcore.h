@@ -48,7 +48,7 @@ public:
         :core_id(core_id),
         program_counter(0,end_point),
         probes(probes),
-        branch_predictor(0,probes.total_branch_predictions)
+        branch_predictor(1,probes.total_branch_predictions)
     {
         this->enable_signal.FetchEnable = 1;
         this->enable_signal.DecodeEnable = 1;
@@ -365,6 +365,11 @@ public:
                 else {
                     probes.correct_branch_predictions += 1;
                 }
+            }
+            // Flush IF-ID and ID-EX when BP off
+            else if (actual_taken == 1) {
+                pipeline_registers_write.IF_ID_register.valid = 0;
+                pipeline_registers_write.ID_EX_register.valid = 0;
             }
 
             //JumpUnit execution

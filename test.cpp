@@ -27,7 +27,7 @@ int RunCommands(CPUcore &core, L2Cache& l2cache, RAM &ram, int num_commands, int
 
     ram.loadCommands(commands, num_commands);
 
-    for (int i=0;i<200;i++) {
+    for (int i=0;i<1000;i++) {
         cout<<endl;
         cout<<"================================"<<endl;
         cout<<"->Cycle "<<i<<endl;
