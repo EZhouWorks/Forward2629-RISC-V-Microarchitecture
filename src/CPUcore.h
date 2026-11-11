@@ -32,7 +32,7 @@ public:
     Decoder decoder = Decoder();
     RegisterFile registerFile = RegisterFile();
     int core_id;
-    int set_associative_on = 1;
+    int set_associative_on = 0;
     L1Cache l1_cache = L1Cache(set_associative_on);
     PipelineRegisters pipeline_registers_write = PipelineRegisters(); //this pipeline register set is write only
     PipelineRegisters pipeline_registers_read = PipelineRegisters();  //this pipeline register set is read only

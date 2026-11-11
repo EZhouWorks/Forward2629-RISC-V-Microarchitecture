@@ -45,9 +45,9 @@ public:
         
     };
 
-    float calculate_BPA(int BPU_enable) {
+    void calculate_BPA(int BPU_enable) {
         if (total_branch_predictions != 0) {
-            return correct_branch_predictions / total_branch_predictions;
+            cout<<"Branch Prediction Accuracy: "<<float(correct_branch_predictions) / total_branch_predictions<<endl;
         }
         else {
             cout<<"NO BRANCH PREDICTIONS DONE"<<endl;

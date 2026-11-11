@@ -13,9 +13,11 @@ public:
     uint8_t GlobalHistoryRegister = 0b00000000;
     array<uint8_t, 256> PatternHistoryTable;
     int enable;
-    int total_branch_predictions;
+    int& total_branch_predictions;
 
-    BranchPredictor(int enable, int& total_branch_predictions) {
+    BranchPredictor(int enable, int& total_branch_predictions) :
+    total_branch_predictions(total_branch_predictions)
+    {
         GlobalHistoryRegister = 0b00000000;
         for (int i = 0; i < 256; i++) {
             PatternHistoryTable[i] = 0b00000010; //initializes all default to strongly taken
