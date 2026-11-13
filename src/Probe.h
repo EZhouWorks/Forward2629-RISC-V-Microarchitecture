@@ -19,6 +19,7 @@ public:
     int fetch_cache_hit_count;
     int retired_instructions;
     int total_branch_predictions;
+    int total_executed_predictions; //This accounts the predictions actually executed and as a result
     int correct_branch_predictions;
     int IF_active_count;
     int ID_active_count;
@@ -36,6 +37,7 @@ public:
         data_store_hit_count = 0;
         retired_instructions = 0;
         total_branch_predictions = 0;
+        total_executed_predictions = 0;
         correct_branch_predictions = 0;
         IF_active_count = 0;
         ID_active_count = 0;
@@ -44,13 +46,17 @@ public:
         WB_active_count = 0;
         
     };
-
-    void calculate_BPA(int BPU_enable) {
+    void calculate_BPA(int BPU_enable) { //overall accuracy
         if (total_branch_predictions != 0) {
-            cout<<"Branch Prediction Accuracy: "<<float(correct_branch_predictions) / total_branch_predictions<<endl;
+            cout<<"Overall Branch Prediction Accuracy: "<<float(correct_branch_predictions) / total_branch_predictions<<endl;
         }
         else {
             cout<<"NO BRANCH PREDICTIONS DONE"<<endl;
+        }
+    }
+    void calculate_executed_BPA() { //executed accuracy
+        if (total_branch_predictions != 0) {
+            cout<<"Branch Prediction Accuracy: "<<float(correct_branch_predictions) / total_executed_predictions<<endl;
         }
     }
     void calculate_IPC() {

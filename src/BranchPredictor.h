@@ -55,8 +55,13 @@ public:
         }
     }
 
-    void updatePHT(uint32_t command_addr, int actual_taken) {
+    uint32_t get_PHT_entry(uint32_t command_addr) {
         int PHT_entry = static_cast<uint8_t>((command_addr >> 2) & 0xFF) ^ GlobalHistoryRegister;
+        return PHT_entry;
+    }
+
+    void updatePHT(uint32_t command_addr, int actual_taken, int PHT_entry) {
+        //int PHT_entry = static_cast<uint8_t>((command_addr >> 2) & 0xFF) ^ GlobalHistoryRegister;
         if (actual_taken == 1) {
             if (PatternHistoryTable[PHT_entry] == 0b00000011) {
                 PatternHistoryTable[PHT_entry] = 0b00000011;

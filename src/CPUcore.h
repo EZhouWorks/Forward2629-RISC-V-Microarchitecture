@@ -105,6 +105,8 @@ public:
                 if (branch_predictor.enable == 1) {
                     if (branch_predictor.PreTypeDecode(pipeline_registers_write.IF_ID_register.machine_code) == 1) {
                         pipeline_registers_write.IF_ID_register.branch_command_addr = program_counter.PC_value;
+                        // Pass current PHT along the pipeline
+                        pipeline_registers_write.IF_ID_register.PHT_value = branch_predictor.get_PHT_entry(pipeline_registers_write.IF_ID_register.command_PC_value);
                         if (branch_predictor.predict(pipeline_registers_write.IF_ID_register.command_PC_value) == 1) { //taken
                             uint32_t offset = branch_predictor.PreCommandAddrDecode(pipeline_registers_write.IF_ID_register.machine_code);
                             program_counter.StepForward(offset);
@@ -250,6 +252,7 @@ public:
             pipeline_registers_write.ID_EX_register.J_imm = decoder.J_imm;
             pipeline_registers_write.ID_EX_register.branch_prediction = pipeline_registers_read.IF_ID_register.branch_prediction;
             pipeline_registers_write.ID_EX_register.branch_command_addr = pipeline_registers_read.IF_ID_register.branch_command_addr;
+            pipeline_registers_write.ID_EX_register.PHT_value = pipeline_registers_read.IF_ID_register.PHT_value;
             pipeline_registers_write.ID_EX_register.valid = 1;
 
         }
@@ -286,6 +289,7 @@ public:
             uint32_t branch_command_addr = pipeline_registers_read.ID_EX_register.branch_command_addr;
             Memory_op memory_op = pipeline_registers_read.ID_EX_register.Memory_op;
             Store_op store_op = pipeline_registers_read.ID_EX_register.Store_op;
+            uint32_t PHT_value = pipeline_registers_read.ID_EX_register.PHT_value;
 
             //WB bypass
             if (pipeline_registers_read.MEM_WB_register.valid == 1 and forwarding_unit.ForwardingCompare(pipeline_registers_read.MEM_WB_register.rd_addr,rs1_addr) == 1) {
@@ -345,8 +349,9 @@ public:
 
             //Branch Predictor execution
             if (branch_predictor.enable == 1 and branch_op != NO_BRANCH_OP) {
+                probes.total_executed_predictions += 1;
                 //update PHT
-                branch_predictor.updatePHT(command_PC_value,actual_taken);
+                branch_predictor.updatePHT(command_PC_value,actual_taken, PHT_value);
                 //update GHR
                 branch_predictor.GlobalHistoryRegister = (branch_predictor.GlobalHistoryRegister << 1) | actual_taken;
 
@@ -356,7 +361,7 @@ public:
                     pipeline_registers_write.ID_EX_register.valid = 0;
 
                     if (actual_taken == 1 and branch_prediction == 0) {
-
+                        program_counter.SetValue(command_PC_value + B_imm);
                     }
                     if (actual_taken == 0 and branch_prediction == 1) {
                         program_counter.SetValue(branch_command_addr+4);
