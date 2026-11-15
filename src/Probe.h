@@ -68,7 +68,7 @@ public:
     }
     void calculate_load_hit_count() {
         if (total_read_visit != 0) {
-            cout<<"Cache Hit Count (Read): "<<100*float(data_cache_hit_count)/total_read_visit<<"%"<<endl;
+            cout<<"Cache Hit Rate (Read): "<<100*float(data_cache_hit_count)/total_read_visit<<"%"<<endl;
         }
         else {
             cout<<"NO READ OPERATIONS"<<endl;
@@ -76,7 +76,7 @@ public:
     }
     void calculate_store_hit_count() {
         if (total_store_visit != 0) {
-            cout<<"Cache Hit Count (Store): "<<100*float(data_store_hit_count)/total_store_visit<<"%"<<endl;
+            cout<<"Cache Hit Rate (Store): "<<100*float(data_store_hit_count)/total_store_visit<<"%"<<endl;
         }
         else {
             cout<<"NO STORE OPERATIONS"<<endl;
@@ -84,7 +84,7 @@ public:
     }
     void calculate_overall_hit() {
         if (total_mem_visit != 0) {
-            cout<<"Cache Hit Count (Overall): "<<100*float(data_store_hit_count + data_cache_hit_count)/total_mem_visit<<"%"<<endl;
+            cout<<"Cache Hit Rate (Overall): "<<100*float(data_store_hit_count + data_cache_hit_count)/total_mem_visit<<"%"<<endl;
         }
         else {
             cout<<"NO MEM OPERATIONS"<<endl;

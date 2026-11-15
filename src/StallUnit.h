@@ -18,14 +18,14 @@ class StallUnit {
 public:
     StallUnit() {}
     int checkStall(ID_EX_data& EX_command, uint32_t current_command_src_addr){
-        if (EX_command.Memory_op != NO_MEMORY_OP and EX_command.rd_addr == current_command_src_addr){
+        if (EX_command.Memory_op != NO_MEMORY_OP and EX_command.rd_addr == current_command_src_addr){ //Load-use hazard
             cout<<"STALL DETECTED"<<endl;
             return 1;
         }
-        if (EX_command.Store_op != NO_STORE_OP and EX_command.rd_addr == current_command_src_addr) {
-            cout<<"STALL DETECTED"<<endl;
-            return 1;
-        }
+        // if (EX_command.Store_op != NO_STORE_OP and EX_command.rd_addr == current_command_src_addr) { //Store-use hazard
+        //     cout<<"STALL DETECTED"<<endl;
+        //     return 1;
+        // }
         else {
             return 0;
         }
