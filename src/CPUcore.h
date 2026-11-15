@@ -210,7 +210,10 @@ public:
             pipeline_registers_write.ID_EX_register.rd_addr = decoder.rd;
 
             //WB Bypass
-            if (pipeline_registers_read.MEM_WB_register.valid == 1 and forwarding_unit.ForwardingCompare(pipeline_registers_read.MEM_WB_register.rd_addr,decoder.rs1) == 1) {
+            pipeline_registers_write.ID_EX_register.rs1_val = registerFile.read(decoder.rs1);
+            if (pipeline_registers_read.MEM_WB_register.valid == 1
+                and pipeline_registers_read.MEM_WB_register.rd_addr != 0
+                and forwarding_unit.ForwardingCompare(pipeline_registers_read.MEM_WB_register.rd_addr,decoder.rs1) == 1) {
                 if (pipeline_registers_read.MEM_WB_register.RegFile_op == SAVE_ALU_RESULT){
                     pipeline_registers_write.ID_EX_register.rs1_val = pipeline_registers_read.MEM_WB_register.ALU_result;
                 }
@@ -221,10 +224,14 @@ public:
                     pipeline_registers_write.ID_EX_register.rs1_val = pipeline_registers_read.MEM_WB_register.command_PC_value;
                 }
             }
-            else {
-                pipeline_registers_write.ID_EX_register.rs1_val = registerFile.read(decoder.rs1);
-            }
-            if (pipeline_registers_read.MEM_WB_register.valid == 1 and forwarding_unit.ForwardingCompare(pipeline_registers_read.MEM_WB_register.rd_addr,decoder.rs2) == 1) {
+            // else {
+            //     pipeline_registers_write.ID_EX_register.rs1_val = registerFile.read(decoder.rs1);
+            // }
+
+            pipeline_registers_write.ID_EX_register.rs2_val = registerFile.read(decoder.rs2);
+            if (pipeline_registers_read.MEM_WB_register.valid == 1
+                and pipeline_registers_read.MEM_WB_register.rd_addr != 0
+                and forwarding_unit.ForwardingCompare(pipeline_registers_read.MEM_WB_register.rd_addr,decoder.rs2) == 1) {
                 if (pipeline_registers_read.MEM_WB_register.RegFile_op == SAVE_ALU_RESULT){
                     pipeline_registers_write.ID_EX_register.rs2_val = pipeline_registers_read.MEM_WB_register.ALU_result;
                 }
@@ -235,9 +242,9 @@ public:
                     pipeline_registers_write.ID_EX_register.rs2_val = pipeline_registers_read.MEM_WB_register.command_PC_value;
                 }
             }
-            else {
-                pipeline_registers_write.ID_EX_register.rs2_val = registerFile.read(decoder.rs2);
-            }
+            // else {
+            //     pipeline_registers_write.ID_EX_register.rs2_val = registerFile.read(decoder.rs2);
+            // }
 
             pipeline_registers_write.ID_EX_register.I_12bit_imm = decoder.I_12bit_imm;
             pipeline_registers_write.ID_EX_register.I_shamt_imm = decoder.I_shamt_imm;
@@ -292,7 +299,11 @@ public:
             uint32_t PHT_value = pipeline_registers_read.ID_EX_register.PHT_value;
 
             //WB bypass
-            if (pipeline_registers_read.MEM_WB_register.valid == 1 and forwarding_unit.ForwardingCompare(pipeline_registers_read.MEM_WB_register.rd_addr,rs1_addr) == 1) {
+            if (pipeline_registers_read.MEM_WB_register.valid == 1
+                // and pipeline_registers_read.EX_MEM_register.Store_op == NO_STORE_OP // Ops that do not change reg value
+                // and pipeline_registers_read.EX_MEM_register.branch_op == NO_BRANCH_OP
+                and pipeline_registers_read.MEM_WB_register.rd_addr != 0
+                and forwarding_unit.ForwardingCompare(pipeline_registers_read.MEM_WB_register.rd_addr,rs1_addr) == 1) {
                 if (pipeline_registers_read.MEM_WB_register.RegFile_op == SAVE_ALU_RESULT){
                     rs1_input_val = pipeline_registers_read.MEM_WB_register.ALU_result;
                 }
@@ -303,7 +314,11 @@ public:
                     rs1_input_val = pipeline_registers_read.MEM_WB_register.command_PC_value;
                 }
             }
-            if (pipeline_registers_read.MEM_WB_register.valid == 1 and forwarding_unit.ForwardingCompare(pipeline_registers_read.MEM_WB_register.rd_addr,rs2_addr) == 1) {
+            if (pipeline_registers_read.MEM_WB_register.valid == 1
+                // and pipeline_registers_read.EX_MEM_register.Store_op == NO_STORE_OP // Ops that do not change reg value
+                // and pipeline_registers_read.EX_MEM_register.branch_op == NO_BRANCH_OP
+                and pipeline_registers_read.MEM_WB_register.rd_addr != 0 //
+                and forwarding_unit.ForwardingCompare(pipeline_registers_read.MEM_WB_register.rd_addr,rs2_addr) == 1) {
                 if (pipeline_registers_read.MEM_WB_register.RegFile_op == SAVE_ALU_RESULT){
                     rs2_input_val = pipeline_registers_read.MEM_WB_register.ALU_result;
                 }
@@ -316,11 +331,19 @@ public:
             }
 
             //ALU forwarding check
-            if (pipeline_registers_write.EX_MEM_register.valid == 1 and forwarding_unit.ForwardingCompare(rs1_addr,pipeline_registers_read.EX_MEM_register.rd_addr) == 1) {
+            if (pipeline_registers_read.EX_MEM_register.valid == 1
+                and pipeline_registers_read.EX_MEM_register.RegFile_op != NO_RegFile_OP // avoid ops that do not change reg val
+                and pipeline_registers_read.EX_MEM_register.Memory_op == NO_MEMORY_OP // avoid mem addr from load being forwarded
+                and pipeline_registers_read.EX_MEM_register.rd_addr != 0
+                and forwarding_unit.ForwardingCompare(rs1_addr,pipeline_registers_read.EX_MEM_register.rd_addr) == 1) {
                 rs1_input_val = pipeline_registers_read.EX_MEM_register.ALU_result; //fetch ALU result from the read register of the next stage
                 //cout<<"FORWARDED FROM ALU RESULT"<<endl;
             }
-            if (pipeline_registers_write.EX_MEM_register.valid == 1 and forwarding_unit.ForwardingCompare(rs2_addr,pipeline_registers_read.EX_MEM_register.rd_addr) == 1) {
+            if (pipeline_registers_read.EX_MEM_register.valid == 1
+                and pipeline_registers_read.EX_MEM_register.RegFile_op != NO_RegFile_OP // avoid ops that do not change reg val
+                and pipeline_registers_read.EX_MEM_register.Memory_op == NO_MEMORY_OP // avoid mem addr from load being forwarded
+                and pipeline_registers_read.EX_MEM_register.rd_addr != 0
+                and forwarding_unit.ForwardingCompare(rs2_addr,pipeline_registers_read.EX_MEM_register.rd_addr) == 1) {
                 rs2_input_val = pipeline_registers_read.EX_MEM_register.ALU_result;
                 //cout<<"FORWARDED FROM ALU RESULT"<<endl;
             }
@@ -384,6 +407,9 @@ public:
                 pipeline_registers_write.ID_EX_register.valid = 0;
                 // cout<<"PC value at EXE = "<<program_counter.PC_value<<endl;
             }
+            if (jump_op != NO_JUMP_OP) { // switch ALU result to cmdPC + 4 for future forwarding
+                ALU_result = pipeline_registers_write.EX_MEM_register.command_PC_value;
+            }
 
             //Store-Load stall
             if (memory_op != NO_MEMORY_OP and pipeline_registers_read.EX_MEM_register.Store_op != NO_STORE_OP) {
@@ -408,6 +434,7 @@ public:
             pipeline_registers_write.EX_MEM_register.Store_op = pipeline_registers_read.ID_EX_register.Store_op;
             pipeline_registers_write.EX_MEM_register.ALU_result = ALU_result;
             pipeline_registers_write.EX_MEM_register.RegFile_op = pipeline_registers_read.ID_EX_register.RegFile_op;
+            pipeline_registers_write.EX_MEM_register.branch_op = branch_op;
             pipeline_registers_write.EX_MEM_register.valid = 1;
 
 

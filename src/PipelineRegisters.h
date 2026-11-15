@@ -61,6 +61,7 @@ struct EX_MEM_data {
     uint32_t command_PC_value;
     int prev_store_op;
     uint32_t store_op_target_addr;
+    Branch_op branch_op;
 };
 struct MEM_WB_data {
     int valid;

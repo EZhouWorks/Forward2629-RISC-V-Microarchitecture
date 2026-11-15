@@ -25,7 +25,7 @@ public:
     }
     uint32_t JALR(uint32_t command_PC_value, uint32_t target_command_addr, ProgramCounter& program_counter) {
         program_counter.jump_taken = 1;
-        program_counter.Jump(target_command_addr);
+        program_counter.Jump(target_command_addr & ~uint32_t{1});
         return command_PC_value+4;
     }
     uint32_t operate(Jump_op jump_op, uint32_t command_PC_value, uint32_t target_command_addr, ProgramCounter& program_counter) {
