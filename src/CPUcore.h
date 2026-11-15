@@ -176,7 +176,7 @@ public:
             else {
                 //Load-Store Stall
                 if (pipeline_registers_read.ID_EX_register.valid == 1 and pipeline_registers_read.ID_EX_register.Memory_op != NO_MEMORY_OP) {
-                    if (pipeline_registers_read.ID_EX_register.valid == 1 and stall_unit.CheckLoadStoreStall(decoder.rs2,pipeline_registers_read.ID_EX_register.rd_addr) == 1) {
+                    if (pipeline_registers_read.ID_EX_register.valid == 1 and (stall_unit.CheckLoadStoreStall(decoder.rs2,pipeline_registers_read.ID_EX_register.rd_addr) == 1 or stall_unit.CheckLoadStoreStall(decoder.rs1,pipeline_registers_read.ID_EX_register.rd_addr) == 1)) {
                         cout<<"LS STALL"<<endl;
                         pipeline_registers_write.ID_EX_register.ALU_operation = NO_ALU_OP;
                         pipeline_registers_write.ID_EX_register.Memory_op = NO_MEMORY_OP;
