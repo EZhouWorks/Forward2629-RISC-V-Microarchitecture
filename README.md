@@ -26,7 +26,9 @@ This is a C++ based multicore RISC-V CPU simulation
 1.2-bit saturating counter  
 
 7st stage: benchmark:  **-> current stage**  
-1.CPI  
+1. data collection
+2. tech report **-> current stage**  
+
 
 8st stage: FPGA implementation:
 
